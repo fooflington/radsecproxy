@@ -938,6 +938,17 @@ const char *radmsgtype2string(uint8_t code) {
     return code < 14 && *rad_msg_names[code] ? rad_msg_names[code] : "Unknown";
 }
 
+const char *radacctmsgtype2string(uint8_t code) {
+    static const char *rad_acct_msg_names[] = {
+        "", "Start", "Stop", "Interim-Update",
+        "", "", "",
+        "Accounting-On", "Accounting-Off",
+        "", "", "", "", "", "",
+        "Failed"
+    };
+    return code < 15 && *rad_acct_msg_names[code] ? rad_acct_msg_names[code] : "Unknown";
+}
+
 void char2hex(char *h, unsigned char c) {
     static const char hexdigits[] = { '0', '1', '2', '3', '4', '5', '6', '7',
 				      '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
@@ -1021,9 +1032,18 @@ void replylog(struct radmsg *msg, struct server *server, struct request *rq) {
     }
 
     if (msg->code == RAD_Access_Accept || msg->code == RAD_Access_Reject || msg->code == RAD_Accounting_Response) {
-        if (msg->code == RAD_Accounting_Response)
+        if (msg->code == RAD_Accounting_Response) {
             level = DBG_INFO;
-        if (logusername) {
+            // char *kvp = NULL;
+            debug(level, "Accounting debug");
+
+            /* debug(level, "%s(%s) for user %s%s from %s%s to %s (%s): [%s]",
+                radmsgtype2string(msg->code), radacctmsgtype2string(radmsg_gettype(rq->msg, RAD_Attr_Acct_Status_Type)),
+                logusername, logstationid ? logstationid : "",
+                servername, replymsg ? (char *)replymsg : "", rq->from->conf->name,
+                addr2string(rq->from->addr, tmp, sizeof(tmp)), kvp ? kvp : ""); */
+        }
+        else if (logusername) {
             debug(level, "%s for user %s%s from %s%s to %s (%s)",
                 radmsgtype2string(msg->code), logusername, logstationid ? logstationid : "",
                 servername, replymsg ? (char *)replymsg : "", rq->from->conf->name,
@@ -1305,6 +1325,7 @@ int radsrv(struct request *rq) {
 	    debug(DBG_INFO, "radsrv: sending %s (id %d) to %s (%s) for %s", radmsgtype2string(RAD_Access_Reject), msg->id, from->conf->name, addr2string(from->addr, tmp, sizeof(tmp)), userascii);
 	    respond(rq, RAD_Access_Reject, realm->message, 1, 1);
 	} else if (realm->accresp && msg->code == RAD_Accounting_Request) {
+        // accounting_log(rq);
 	    respond(rq, RAD_Accounting_Response, NULL, 1, 0);
 	}
 	goto exit;

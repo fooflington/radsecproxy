@@ -28,6 +28,15 @@
 #define RAD_Attr_CHAP_Challenge 60
 #define RAD_Attr_Tunnel_Password 69
 #define RAD_Attr_Message_Authenticator 80
+#define RAD_Attr_Acct_Status_Type 40
+
+#define RAD_Acct_Status_Start 1
+#define RAD_Acct_Status_Stop 2
+#define RAD_Acct_Status_Alive 3
+#define RAD_Acct_Status_Interim_Update 3
+#define RAD_Acct_Status_Accounting_On 7
+#define RAD_Acct_Status_Accounting_Off 8
+#define RAD_Acct_Status_Failed 15
 
 #define RAD_VS_ATTR_MS_MPPE_Send_Key 16
 #define RAD_VS_ATTR_MS_MPPE_Recv_Key 17
