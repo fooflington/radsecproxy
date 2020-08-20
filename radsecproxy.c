@@ -1344,6 +1344,7 @@ int radsrv(struct request *rq) {
 			Acct-Output-Octets,
 				Acct-Terminate-Cause */
 		);
+        // accounting_log(rq);
 	    respond(rq, RAD_Accounting_Response, NULL, 1, 0);
 	}
 	goto exit;
