@@ -1325,7 +1325,25 @@ int radsrv(struct request *rq) {
 	    debug(DBG_INFO, "radsrv: sending %s (id %d) to %s (%s) for %s", radmsgtype2string(RAD_Access_Reject), msg->id, from->conf->name, addr2string(from->addr, tmp, sizeof(tmp)), userascii);
 	    respond(rq, RAD_Access_Reject, realm->message, 1, 1);
 	} else if (realm->accresp && msg->code == RAD_Accounting_Request) {
-        // accounting_log(rq);
+		debug(DBG_INFO, "radsrv: Accounting: %s (id %d) at %s from client %s (%s): (%s, %s, %s, %s)",
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)),
+			msg->id,
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Event_Timestamp)),
+			from->conf->name,
+			addr2string(from->addr, tmp, sizeof(tmp)),
+
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Session_Id)),
+			userascii,
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Called_Station_Id)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id)),
+			/* NAS-IP-Address,
+			Acct-Session-Time,
+			Acct-Input-Packets,
+			Acct-Input-Octets,
+			Acct-Output-Packets,
+			Acct-Output-Octets,
+				Acct-Terminate-Cause */
+		);
 	    respond(rq, RAD_Accounting_Response, NULL, 1, 0);
 	}
 	goto exit;

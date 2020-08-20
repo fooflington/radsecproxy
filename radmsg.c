@@ -414,6 +414,24 @@ int resizeattr(struct tlv *attr, uint8_t newlen) {
     return 0;
 }
 
+int attrval2str(struct tlv *attr, char *attrval) {
+    switch (attr->t) {
+        case RAD_Attr_Acct_Status_Type:
+            memcpy(attrval, RAD_Attr_Acct_Status_Type_Dict[attr->v] ? RAD_Attr_Acct_Status_Type_Dict[attr->v] : RAD_Dict_Unknown_Value);
+            return 0;
+            break;
+
+        case RAD_Attr_Acct_Terminate_Cause:
+            memcpy(attrval, RAD_Attr_Acct_Terminate_Cause_Dict[attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[attr->v] : RAD_Dict_Unknown_Value);
+            return 0;
+            break;
+
+        default:
+            return -1;
+            break;
+    }
+}
+
 /* Local Variables: */
 /* c-file-style: "stroustrup" */
 /* End: */
