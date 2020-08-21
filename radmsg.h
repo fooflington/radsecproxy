@@ -22,6 +22,7 @@
 #define RAD_Attr_User_Password 2
 #define RAD_Attr_CHAP_Password 3
 #define RAD_Attr_NAS_IP_Address 4
+#define RAD_Attr_Framed_IP_Address 8
 #define RAD_Attr_Reply_Message 18
 #define RAD_Attr_Vendor_Specific 26
 #define RAD_Attr_Called_Station_Id 30
@@ -33,7 +34,8 @@
 #define RAD_Attr_Acct_Status_Type 40
 #define RAD_Attr_Acct_Input_Octets 42
 #define RAD_Attr_Acct_Output_Octets 43
-#define RAD_Attr_Acct_Session_Id 46
+#define RAD_Attr_Acct_Session_Id 44
+#define RAD_Attr_Acct_Session_Time 46
 #define RAD_Attr_Acct_Input_Packets 47
 #define RAD_Attr_Acct_Output_Packets 48
 #define RAD_Attr_Acct_Terminate_Cause 49
@@ -51,41 +53,6 @@
 #define RAD_VS_ATTR_MS_MPPE_Recv_Key 17
 
 #define RAD_Dict_Unknown_Value "UNKNOWN"
-char* RAD_Attr_Acct_Terminate_Cause_Dict[] = {
-        "User-Request",
-        "Lost-Carrier",
-        "Lost-Service",
-        "Idle-Timeout",
-        "Session-Timeout",
-        "Admin-Reset",
-        "Admin-Reboot",
-        "Port-Error",
-        "NAS-Error",
-        "NAS-Request",
-        "NAS-Reboot",
-        "Port-Unneeded",
-        "Port-Preempted",
-        "Port-Suspended",
-        "Service-Unavailable",
-        "Callback",
-        "User-Error",
-        "Host-Request",
-}
-
-char* RAD_Attr_Acct_Status_Type_Dict[] = {
-        "Start",
-        "Stop",
-        "Interim-Update",
-        "Accounting-On",
-        "Accounting-Off",
-        "Tunnel-Start",
-        "Tunnel-Stop",
-        "Tunnel-Reject",
-        "Tunnel-Link-Start",
-        "Tunnel-Link-Stop",
-        "Tunnel-Link-Reject",
-        "Failed",
-};
 
 struct radmsg {
     uint8_t code;
@@ -115,6 +82,7 @@ int vattrname2val(char *attrname, uint32_t *vendor, uint32_t *type);
 int attrvalidate(unsigned char *attrs, int length);
 struct tlv *makevendortlv(uint32_t vendor, struct tlv *attr);
 int resizeattr(struct tlv *attr, uint8_t newlen);
+char* attrval2str(struct tlv *attr);
 
 #endif /*_RADMSG_H*/
 

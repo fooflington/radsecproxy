@@ -97,10 +97,8 @@ void rmtlv(struct list *tlvs, uint8_t t) {
 }
 
 uint8_t *tlv2str(struct tlv *tlv) {
-    char *attrval_str;
-    if(attrval2str(tlv->t, attrval_str) == 0) {
-        return attrval_str;
-    }
+    if(!tlv)
+        return '\0';
     uint8_t *s = malloc(tlv->l + 1);
     if (s) {
 	memcpy(s, tlv->v, tlv->l);

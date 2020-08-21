@@ -1325,8 +1325,18 @@ int radsrv(struct request *rq) {
 	    debug(DBG_INFO, "radsrv: sending %s (id %d) to %s (%s) for %s", radmsgtype2string(RAD_Access_Reject), msg->id, from->conf->name, addr2string(from->addr, tmp, sizeof(tmp)), userascii);
 	    respond(rq, RAD_Access_Reject, realm->message, 1, 1);
 	} else if (realm->accresp && msg->code == RAD_Accounting_Request) {
-		debug(DBG_INFO, "radsrv: Accounting: %s (id %d) at %s from client %s (%s): (%s, %s, %s, %s)",
-			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)),
+		debug(DBG_INFO, "Accounting: User-Name = %s", userascii);
+		debug(DBG_INFO, "Accounting: Called-Station-Id = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Called_Station_Id)));
+		debug(DBG_INFO, "Accounting: Calling-Station-Id = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id)));
+		debug(DBG_INFO, "Accounting: Status-Type = %s", attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)));
+		debug(DBG_INFO, "Accounting: Event-Timestamp = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Event_Timestamp)));
+		debug(DBG_INFO, "Accounting: NAS-IP-Address = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_NAS_IP_Address)));
+		debug(DBG_INFO, "Accounting: Framed-IP-Address = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Framed_IP_Address)));
+		debug(DBG_INFO, "Accounting: Acct-Session-Time = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Session_Time)));
+		debug(DBG_INFO, "Accounting: Acct-Input-Packets = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Input_Packets)));
+		debug(DBG_INFO, "Accounting: Acct-Terminate-Cause = %s", attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Terminate_Cause)));
+		debug(DBG_NOTICE, "radsrv: Accounting: %s (id %d) at %s from client %s (%s): SID=%s, User-Name=%s, Ced-S-Id=%s, Cing-S-Id=%s, NAS-IP=%s, Framed-IP=%s, Sess-Time=%s, In-Packets=%d, In-Octets=%d, Out-Packets=%d, Out-Octets=%d, Terminate-Cause=%s)",
+			attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)),
 			msg->id,
 			tlv2str(radmsg_gettype(msg, RAD_Attr_Event_Timestamp)),
 			from->conf->name,
@@ -1336,13 +1346,14 @@ int radsrv(struct request *rq) {
 			userascii,
 			tlv2str(radmsg_gettype(msg, RAD_Attr_Called_Station_Id)),
 			tlv2str(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id)),
-			/* NAS-IP-Address,
-			Acct-Session-Time,
-			Acct-Input-Packets,
-			Acct-Input-Octets,
-			Acct-Output-Packets,
-			Acct-Output-Octets,
-				Acct-Terminate-Cause */
+			tlv2str(radmsg_gettype(msg, RAD_Attr_NAS_IP_Address)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Framed_IP_Address)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Session_Time)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Input_Packets)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Input_Octets)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Output_Packets)),
+			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Output_Octets)),
+			attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Terminate_Cause))
 		);
         // accounting_log(rq);
 	    respond(rq, RAD_Accounting_Response, NULL, 1, 0);

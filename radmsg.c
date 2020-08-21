@@ -414,22 +414,60 @@ int resizeattr(struct tlv *attr, uint8_t newlen) {
     return 0;
 }
 
-int attrval2str(struct tlv *attr, char *attrval) {
+
+char* RAD_Attr_Acct_Terminate_Cause_Dict[] = {
+        "User-Request",
+        "Lost-Carrier",
+        "Lost-Service",
+        "Idle-Timeout",
+        "Session-Timeout",
+        "Admin-Reset",
+        "Admin-Reboot",
+        "Port-Error",
+        "NAS-Error",
+        "NAS-Request",
+        "NAS-Reboot",
+        "Port-Unneeded",
+        "Port-Preempted",
+        "Port-Suspended",
+        "Service-Unavailable",
+        "Callback",
+        "User-Error",
+        "Host-Request",
+};
+
+char* RAD_Attr_Acct_Status_Type_Dict[] = {
+        "Start",
+        "Stop",
+        "Interim-Update",
+        "Accounting-On",
+        "Accounting-Off",
+        "Tunnel-Start",
+        "Tunnel-Stop",
+        "Tunnel-Reject",
+        "Tunnel-Link-Start",
+        "Tunnel-Link-Stop",
+        "Tunnel-Link-Reject",
+        "Failed",
+};
+
+char* attrval2str(struct tlv *attr) {
+    if(!attr) return '\0';
     switch (attr->t) {
         case RAD_Attr_Acct_Status_Type:
-            memcpy(attrval, RAD_Attr_Acct_Status_Type_Dict[attr->v] ? RAD_Attr_Acct_Status_Type_Dict[attr->v] : RAD_Dict_Unknown_Value);
-            return 0;
+            // strncpy(retval, RAD_Attr_Acct_Status_Type_Dict[*attr->v] ? RAD_Attr_Acct_Status_Type_Dict[*attr->v] : RAD_Dict_Unknown_Value, 32);
+	    return RAD_Attr_Acct_Status_Type_Dict[*attr->v] ? RAD_Attr_Acct_Status_Type_Dict[*attr->v] : RAD_Dict_Unknown_Value;
             break;
 
         case RAD_Attr_Acct_Terminate_Cause:
-            memcpy(attrval, RAD_Attr_Acct_Terminate_Cause_Dict[attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[attr->v] : RAD_Dict_Unknown_Value);
-            return 0;
+            // strncpy(retval, RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] : RAD_Dict_Unknown_Value, 32);
+	    return RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] : RAD_Dict_Unknown_Value;
             break;
 
         default:
-            return -1;
             break;
     }
+    return RAD_Dict_Unknown_Value;
 }
 
 /* Local Variables: */
