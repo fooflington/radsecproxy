@@ -2,6 +2,7 @@
  * Copyright (c) 2010, NORDUnet A/S */
 /* See LICENSE for licensing information. */
 
+#define _GNU_SOURCE
 #ifdef SYS_SOLARIS9
 #include <sys/inttypes.h>
 #else
@@ -12,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <arpa/inet.h>
+#include <stdio.h>
 
 struct tlv *maketlv(uint8_t t, uint8_t l, void *v) {
     struct tlv *tlv;
@@ -127,6 +129,17 @@ uint32_t tlv2longint(struct tlv *tlv) {
     n += tlv->v[1] << 16;
     n += tlv->v[0] << 24;
     return n;
+}
+
+char* tlv2ipv4addr(struct tlv *tlv) {
+    if(!tlv) return 0;
+    char *rval;
+    if(tlv->v) {
+        uint8_t *v = tlv2str(tlv);
+        asprintf(&rval, "%d.%d.%d.%d", v[0], v[1], v[2], v[3]);
+        free(v);
+    }
+    return rval;
 }
 
 /* Local Variables: */

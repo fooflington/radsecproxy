@@ -420,12 +420,10 @@ char* attrval2str(struct tlv *attr) {
     uint32_t val = tlv2longint(attr) - 1;
     switch (attr->t) {
         case RAD_Attr_Acct_Status_Type:
-            // strncpy(retval, RAD_Attr_Acct_Status_Type_Dict[*attr->v] ? RAD_Attr_Acct_Status_Type_Dict[*attr->v] : RAD_Dict_Unknown_Value, 32);
             return RAD_Attr_Acct_Status_Type_Dict[val] ? RAD_Attr_Acct_Status_Type_Dict[val] : RAD_Dict_Unknown_Value;
             break;
 
         case RAD_Attr_Acct_Terminate_Cause:
-            // strncpy(retval, RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] : RAD_Dict_Unknown_Value, 32);
             return RAD_Attr_Acct_Terminate_Cause_Dict[val] ? RAD_Attr_Acct_Terminate_Cause_Dict[val] : RAD_Dict_Unknown_Value;
             break;
 

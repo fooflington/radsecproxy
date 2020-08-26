@@ -1306,41 +1306,29 @@ int radsrv(struct request *rq) {
 	    respond(rq, RAD_Access_Reject, realm->message, 1, 1);
 	} else if (realm->accresp && msg->code == RAD_Accounting_Request) {
 		//uint8_t* framed_ip_address = tlv2str(radmsg_gettype(msg, RAD_Attr_Framed_IP_Address));
-		uint8_t* nas_ip_address = tlv2str(radmsg_gettype(msg, RAD_Attr_NAS_IP_Address));
-        char* framed_ip_address = 0;
-        struct tlv *a = radmsg_gettype(msg, RAD_Attr_Framed_IP_Address);
-        if(a) {
-            uint8_t *v = tlv2str(a);
-            asprintf(&framed_ip_address, "%d.%d.%d.%d", v[0], v[1], v[2], v[3]);
-        }
+        char* nas_ip_address = tlv2ipv4addr(radmsg_gettype(msg, RAD_Attr_NAS_IP_Address));
+        char* framed_ip_address = tlv2ipv4addr(radmsg_gettype(msg, RAD_Attr_Framed_IP_Address));
 
-#ifdef EPICDEBUG
-		debug(DBG_INFO, "Accounting: User-Name = %s", userascii);
-		debug(DBG_INFO, "Accounting: Called-Station-Id = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Called_Station_Id)));
-		debug(DBG_INFO, "Accounting: Calling-Station-Id = %s", tlv2str(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id)));
-		debug(DBG_INFO, "Accounting: Status-Type = %s", attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)));
-		debug(DBG_INFO, "Accounting: Event-Timestamp = %s", tlv2longint(radmsg_gettype(msg, RAD_Attr_Event_Timestamp)));
-		debug(DBG_INFO, "Accounting: NAS-IP-Address = %d.%d.%d.%d", nas_ip_address[0], nas_ip_address[1], nas_ip_address[2], nas_ip_address[3]);
-		// debug(DBG_INFO, "Accounting: Framed-IP-Address = %d.%d.%d.%d", framed_ip_address[0], framed_ip_address[1], framed_ip_address[2], framed_ip_address[3]);
-		debug(DBG_INFO, "Accounting: Acct-Session-Time = %s", tlv2longint(radmsg_gettype(msg, RAD_Attr_Acct_Session_Time)));
-		debug(DBG_INFO, "Accounting: Acct-Input-Packets = %u", tlv2longint(radmsg_gettype(msg, RAD_Attr_Acct_Input_Packets)));
-		debug(DBG_INFO, "Accounting: Acct-Terminate-Cause = %s", attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Terminate_Cause)));
-#endif
         time_t event_timestamp_i = tlv2longint(radmsg_gettype(msg, RAD_Attr_Event_Timestamp));
         char event_timestamp[64];
+
+        uint8_t *session_id = radattr2ascii(radmsg_gettype(msg, RAD_Attr_Acct_Session_Id));
+        uint8_t *called_station_id = radattr2ascii(radmsg_gettype(msg, RAD_Attr_Called_Station_Id));
+        uint8_t *calling_station_id = radattr2ascii(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id));
         strftime(event_timestamp, sizeof(event_timestamp), "%FT%TZ", gmtime(&event_timestamp_i));
-		debug(DBG_NOTICE, "Accounting %s (id %d) at %s from client %s (%s): SID=%s, User-Name=%s, Ced-S-Id=%s, Cing-S-Id=%s, NAS-IP=%d.%d.%d.%d, Framed-IP=%s, Sess-Time=%u, In-Packets=%u, In-Octets=%u, Out-Packets=%u, Out-Octets=%u, Terminate-Cause=%s)",
+
+		debug(DBG_NOTICE, "Accounting %s (id %d) at %s from client %s (%s): SID=%s, User-Name=%s, Ced-S-Id=%s, Cing-S-Id=%s, NAS-IP=%s, Framed-IP=%s, Sess-Time=%u, In-Packets=%u, In-Octets=%u, Out-Packets=%u, Out-Octets=%u, Terminate-Cause=%s)",
 			attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)),
 			msg->id,
 			event_timestamp,
 			from->conf->name,
 			addr2string(from->addr, tmp, sizeof(tmp)),
 
-			tlv2str(radmsg_gettype(msg, RAD_Attr_Acct_Session_Id)),
+			session_id,
 			userascii,
-			tlv2str(radmsg_gettype(msg, RAD_Attr_Called_Station_Id)),
-			tlv2str(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id)),
-			nas_ip_address[0], nas_ip_address[1], nas_ip_address[2], nas_ip_address[3],
+			called_station_id,
+			calling_station_id,
+			nas_ip_address,
 			framed_ip_address,
 			tlv2longint(radmsg_gettype(msg, RAD_Attr_Acct_Session_Time)),
 			tlv2longint(radmsg_gettype(msg, RAD_Attr_Acct_Input_Packets)),
@@ -1350,6 +1338,10 @@ int radsrv(struct request *rq) {
 			attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Terminate_Cause))
 		);
         free(framed_ip_address);
+        free(nas_ip_address);
+        free(session_id);
+        free(called_station_id);
+        free(calling_station_id);
         // accounting_log(rq);
 	    respond(rq, RAD_Accounting_Response, NULL, 1, 0);
 	}
