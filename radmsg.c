@@ -15,6 +15,7 @@
 #include <pthread.h>
 #include <nettle/hmac.h>
 #include <openssl/rand.h>
+#include "raddict.h"
 
 #define RADLEN(x) ntohs(((uint16_t *)(x))[1])
 
@@ -414,54 +415,18 @@ int resizeattr(struct tlv *attr, uint8_t newlen) {
     return 0;
 }
 
-
-char* RAD_Attr_Acct_Terminate_Cause_Dict[] = {
-        "User-Request",
-        "Lost-Carrier",
-        "Lost-Service",
-        "Idle-Timeout",
-        "Session-Timeout",
-        "Admin-Reset",
-        "Admin-Reboot",
-        "Port-Error",
-        "NAS-Error",
-        "NAS-Request",
-        "NAS-Reboot",
-        "Port-Unneeded",
-        "Port-Preempted",
-        "Port-Suspended",
-        "Service-Unavailable",
-        "Callback",
-        "User-Error",
-        "Host-Request",
-};
-
-char* RAD_Attr_Acct_Status_Type_Dict[] = {
-        "Start",
-        "Stop",
-        "Interim-Update",
-        "Accounting-On",
-        "Accounting-Off",
-        "Tunnel-Start",
-        "Tunnel-Stop",
-        "Tunnel-Reject",
-        "Tunnel-Link-Start",
-        "Tunnel-Link-Stop",
-        "Tunnel-Link-Reject",
-        "Failed",
-};
-
 char* attrval2str(struct tlv *attr) {
     if(!attr) return '\0';
+    uint32_t val = tlv2longint(attr) - 1;
     switch (attr->t) {
         case RAD_Attr_Acct_Status_Type:
             // strncpy(retval, RAD_Attr_Acct_Status_Type_Dict[*attr->v] ? RAD_Attr_Acct_Status_Type_Dict[*attr->v] : RAD_Dict_Unknown_Value, 32);
-	    return RAD_Attr_Acct_Status_Type_Dict[*attr->v] ? RAD_Attr_Acct_Status_Type_Dict[*attr->v] : RAD_Dict_Unknown_Value;
+            return RAD_Attr_Acct_Status_Type_Dict[val] ? RAD_Attr_Acct_Status_Type_Dict[val] : RAD_Dict_Unknown_Value;
             break;
 
         case RAD_Attr_Acct_Terminate_Cause:
             // strncpy(retval, RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] : RAD_Dict_Unknown_Value, 32);
-	    return RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] ? RAD_Attr_Acct_Terminate_Cause_Dict[*attr->v] : RAD_Dict_Unknown_Value;
+            return RAD_Attr_Acct_Terminate_Cause_Dict[val] ? RAD_Attr_Acct_Terminate_Cause_Dict[val] : RAD_Dict_Unknown_Value;
             break;
 
         default:

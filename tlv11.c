@@ -119,6 +119,16 @@ struct tlv *resizetlv(struct tlv *tlv, uint8_t newlen) {
     return tlv;
 }
 
+uint32_t tlv2longint(struct tlv *tlv) {
+    if(!tlv) return 0;
+    uint32_t n = 0;
+    n += tlv->v[3];
+    n += tlv->v[2] << 8;
+    n += tlv->v[1] << 16;
+    n += tlv->v[0] << 24;
+    return n;
+}
+
 /* Local Variables: */
 /* c-file-style: "stroustrup" */
 /* End: */
