@@ -1317,7 +1317,7 @@ int radsrv(struct request *rq) {
         uint8_t *calling_station_id = radattr2ascii(radmsg_gettype(msg, RAD_Attr_Calling_Station_Id));
         strftime(event_timestamp, sizeof(event_timestamp), "%FT%TZ", gmtime(&event_timestamp_i));
 
-		debug(DBG_NOTICE, "Accounting %s (id %d) at %s from client %s (%s): SID=%s, User-Name=%s, Ced-S-Id=%s, Cing-S-Id=%s, NAS-IP=%s, Framed-IP=%s, Sess-Time=%u, In-Packets=%u, In-Octets=%u, Out-Packets=%u, Out-Octets=%u, Terminate-Cause=%s)",
+		debug(DBG_NOTICE, "Accounting %s (id %d) at %s from client %s (%s): { SID=%s, User-Name=%s, Ced-S-Id=%s, Cing-S-Id=%s, NAS-IP=%s, Framed-IP=%s, Sess-Time=%u, In-Packets=%u, In-Octets=%u, Out-Packets=%u, Out-Octets=%u, Terminate-Cause=%s }",
 			attrval2str(radmsg_gettype(msg, RAD_Attr_Acct_Status_Type)),
 			msg->id,
 			event_timestamp,
