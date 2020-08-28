@@ -133,10 +133,13 @@ uint32_t tlv2longint(struct tlv *tlv) {
 
 char* tlv2ipv4addr(struct tlv *tlv) {
     if(!tlv) return 0;
-    char *rval;
+    char *rval = "undef";
     if(tlv->v) {
         uint8_t *v = tlv2str(tlv);
-        asprintf(&rval, "%d.%d.%d.%d", v[0], v[1], v[2], v[3]);
+	char *str;
+        if(asprintf(&str, "%d.%d.%d.%d", v[0], v[1], v[2], v[3]) >=0) {
+            rval = str;
+        }
         free(v);
     }
     return rval;
