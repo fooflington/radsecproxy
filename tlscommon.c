@@ -1133,6 +1133,12 @@ char *getcertsubject(X509 *cert) {
     return print_x509_name(X509_get_subject_name(cert));
 }
 
+char *getcertissuer(X509 *cert) {
+    if (!cert)
+        return NULL;
+    return print_x509_name(X509_get_issuer_name(cert));
+}
+
 #if OPENSSL_VERSION_NUMBER >= 0x10100000
 static int parse_tls_version(uint8_t dtls, const char *version) {
     if (!strcasecmp("", version))
