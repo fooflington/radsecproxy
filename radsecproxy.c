@@ -57,6 +57,7 @@
 #include "radsecproxy.h"
 #include "tcp.h"
 #include "tls.h"
+#include "tlscommon.h"
 #include "udp.h"
 #include "util.h"
 #include <arpa/inet.h>
@@ -1082,6 +1083,8 @@ void replylog(struct radmsg *msg, struct server *server, struct request *rq) {
     char *servername;
     uint8_t level = DBG_NOTICE;
     char tmp[INET6_ADDRSTRLEN], logstationid[128] = {0};
+    SSL *ssl = NULL;
+    X509 *cert = NULL;
 
     servername = server ? server->conf->name : "_self_";
     username = radattr2ascii(radmsg_gettype(rq->msg, RAD_Attr_User_Name));
@@ -1136,10 +1139,12 @@ void replylog(struct radmsg *msg, struct server *server, struct request *rq) {
         if (msg->code == RAD_Accounting_Response)
             level = DBG_INFO;
         if (logusername) {
-            debug(level, "%s for user %s%s%s from %s%s to %s (%s)%s",
+            cert = verifytlscert(rq->from->ssl);
+            debug(level, "%s for user %s%s%s from %s%s to %s (%s)%s more: %s",
                   radmsgtype2string(msg->code), logusername, logstationid, cui ? (char *)cui : "",
                   servername, replymsg ? (char *)replymsg : "", rq->from->conf->name,
-                  addr2string(rq->from->addr, tmp, sizeof(tmp)), operatorname ? (char *)operatorname : "");
+                  addr2string(rq->from->addr, tmp, sizeof(tmp)), operatorname ? (char *)operatorname : ""),
+                  getcertsubject(cert);
         } else {
             debug(level, "%s (response to %s) from %s to %s (%s)", radmsgtype2string(msg->code),
                   radmsgtype2string(rq->msg->code), servername,
