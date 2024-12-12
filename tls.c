@@ -340,7 +340,7 @@ void *tlsservernew(void *arg) {
     unsigned long error;
     struct client *client;
     struct tls *accepted_tls = NULL;
-    char tmp[INET6_ADDRSTRLEN], *subj;
+    char tmp[INET6_ADDRSTRLEN], *subj, *issuer;
     struct hostportres *hp;
 
     s = *(int *)arg;
@@ -409,10 +409,20 @@ void *tlsservernew(void *arg) {
         while (conf) {
             if (!conf->pskid && accepted_tls == conf->tlsconf && (verifyconfcert(cert, conf, NULL, NULL))) {
                 subj = getcertsubject(cert);
+                issuer = getcertissuer(cert);
                 if (subj) {
-                    debug(DBG_WARN, "tlsservernew: TLS connection from %s, client %s, subject %s, %s with cipher %s up",
-                          addr2string((struct sockaddr *)&from, tmp, sizeof(tmp)), conf->name, subj,
-                          SSL_get_version(ssl), SSL_CIPHER_get_name(SSL_get_current_cipher(ssl)));
+                    if (issuer) {
+                        // Log with issuer
+                        debug(DBG_WARN, "tlsservernew: TLS connection from %s, client %s, subject %s, issuer %s, %s with cipher %s up",
+                              addr2string((struct sockaddr *)&from, tmp, sizeof(tmp)), conf->name, subj, issuer,
+                              SSL_get_version(ssl), SSL_CIPHER_get_name(SSL_get_current_cipher(ssl)));
+                        free(issuer);
+                    } else {
+                        // Log without issuer
+                        debug(DBG_WARN, "tlsservernew: TLS connection from %s, client %s, subject %s, %s with cipher %s up",
+                              addr2string((struct sockaddr *)&from, tmp, sizeof(tmp)), conf->name, subj,
+                              SSL_get_version(ssl), SSL_CIPHER_get_name(SSL_get_current_cipher(ssl)));
+                    }
                     free(subj);
                 }
                 X509_free(cert);
